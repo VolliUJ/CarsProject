@@ -7,93 +7,77 @@
 //
 
 import UIKit
+import NVActivityIndicatorView
 
-class CarListVC: UITableViewController {
+class CarListVC: UITableViewController, NVActivityIndicatorViewable {
 
+    let viewModel : CarListViewModel = CarListViewModel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.tableView.backgroundView = UIImageView(image: #imageLiteral(resourceName: "background"))
+        tableView.backgroundView = UIImageView(image: #imageLiteral(resourceName: "background"))
         tableView.register(UINib(nibName: "CarCell", bundle: nil), forCellReuseIdentifier: "car_cell")
         
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        viewModel.model.bind { cars in
+            self.tableView.reloadData()
+        }
+        
+        viewModel.state.bind {
+            switch $0 {
+            case .completed:
+                self.stopAnimating()
+                break
+                
+            case .networking:
+                self.startAnimating()
+                break
+                
+            case .error(let message):
+                self.showErrorDialog(message: message)
+                self.stopAnimating()
+                
+                break
+                
+            case .normal:
+                self.stopAnimating()
+                break
+            }
+        }
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    private func showErrorDialog(message : String){
+        
     }
-
-    // MARK: - Table view data source
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 1
+        return viewModel.numberOfSections
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 5
+        return viewModel.numberOfRows
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "car_cell", for: indexPath)
-
-        // Configure the cell...
-
+        let cell = tableView.dequeueReusableCell(withIdentifier: "car_cell", for: indexPath) as! CarCell
+        cell.viewModel = CarCell.ViewModel(carModel: viewModel.getCar(id: indexPath.item)!)
         return cell
     }
-    
 
-    
-    
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: "showDetailsSegue", sender: self)
     }
 
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        if let viewController = segue.destination as? CarDetailsVC {
+            let id = tableView.indexPathForSelectedRow?.item
+            viewController.viewModel = CarDetailsVC.ViewModel(carModel: viewModel.getCar(id: id!)!)
+        }
     }
-    */
 
+    @IBAction func unwindToCarList(segue:UIStoryboardSegue) {
+        
+    }
+    
 }

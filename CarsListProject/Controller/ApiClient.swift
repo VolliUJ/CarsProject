@@ -9,25 +9,58 @@
 import Foundation
 import Alamofire
 
-class ApiClient {
-    
+enum ApiClient: URLRequestConvertible {
 
+    case create(car: CarModel)
+    case getCars()
+
+    static let baseURLString = "https://iteotest-bb88.restdb.io/rest"
+
+    static let headers = [
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "x-apikey": "5b3dacb6edf3c458803b29be"
+    ]
     
-    init() {
-        
+    var method: HTTPMethod {
+        switch self {
+        case .create:
+            return .post
+        case .getCars:
+            return .get
+        }
     }
     
-    func get() -> [CarModel] {
-        
-        return []
+    var path: String {
+        switch self {
+        case .create:
+            return "/cars"
+        case .getCars():
+            return "/cars"
+       
+        }
     }
     
-    func post(car : CarModel) {
-        
+    var body: Data?{
+        switch self {
+        case .create(let carModel):
+//            return try? carModel.toJSON().rawData()
+            return carModel.toData()
+        default:
+            return nil
+        }
     }
     
-    func delete() {
+    func asURLRequest() throws -> URLRequest {
+        let url = try ApiClient.baseURLString.asURL()
         
+        var urlRequest = URLRequest(url: url.appendingPathComponent(path))
+        urlRequest.httpMethod = method.rawValue
+        urlRequest.allHTTPHeaderFields = ApiClient.headers
+        urlRequest.httpBody = body
+        
+        return urlRequest
     }
-    
 }
+
+

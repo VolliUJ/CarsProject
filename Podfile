@@ -7,7 +7,8 @@ target 'CarsListProject' do
   
   pod 'Alamofire'
   pod 'SwiftyJSON'
-  pod 'RealmSwift'
+  pod 'NVActivityIndicatorView'
+#  pod 'RealmSwift'
   # Pods for CarsListProject
 
   target 'CarsListProjectTests' do
