@@ -21,11 +21,14 @@ class CarListViewModel {
     }
     
     init() {
+        self.state.value = State.networking
         Alamofire.request(ApiClient.getCars()).responseData { responseData in
             switch responseData.result {
             case .success:
 
                 guard let data = responseData.data, let json = try? JSON(data: data) else {
+                    let error = NSError.init(domain: StaticString.domainParseError, code: 600, userInfo: [:]) as Error
+                    self.onError(error: error)
                     return
                 }
                 
@@ -37,10 +40,10 @@ class CarListViewModel {
                 }
                 
                 self.model.value = cars
-                
+                self.state.value = State.completed
                 break
             case .failure(let error):
-                print(error)
+                self.onError(error: error)
                 
                 break
             }
@@ -57,6 +60,10 @@ class CarListViewModel {
     
     func setCar(_ car : CarModel){
         model.value.append(car)
+    }
+    
+    private func onError(error : Error){
+        self.state.value = State.error(StaticString.networkMessageError)
     }
     
 }

@@ -9,15 +9,18 @@
 import UIKit
 import NVActivityIndicatorView
 
-class CarListVC: UITableViewController, NVActivityIndicatorViewable {
+class CarListVC: UITableViewController {
 
-    let viewModel : CarListViewModel = CarListViewModel()
-    
+    var viewModel : CarListViewModel!
+    var loadingView : NVActivityIndicatorView!
+        
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        tableView.backgroundView = UIImageView(image: #imageLiteral(resourceName: "background"))
+        tableView.backgroundColor = UIColor.groupTableViewBackground
         tableView.register(UINib(nibName: "CarCell", bundle: nil), forCellReuseIdentifier: "car_cell")
+        initFrame()
+        
+        viewModel = CarListViewModel()
         
         viewModel.model.bind { cars in
             self.tableView.reloadData()
@@ -34,9 +37,8 @@ class CarListVC: UITableViewController, NVActivityIndicatorViewable {
                 break
                 
             case .error(let message):
-                self.showErrorDialog(message: message)
                 self.stopAnimating()
-                
+                self.showErrorDialog(message: message)
                 break
                 
             case .normal:
@@ -44,10 +46,6 @@ class CarListVC: UITableViewController, NVActivityIndicatorViewable {
                 break
             }
         }
-    }
-
-    private func showErrorDialog(message : String){
-        
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -69,15 +67,41 @@ class CarListVC: UITableViewController, NVActivityIndicatorViewable {
         performSegue(withIdentifier: "showDetailsSegue", sender: self)
     }
 
+
+}
+
+extension CarListVC {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let viewController = segue.destination as? CarDetailsVC {
             let id = tableView.indexPathForSelectedRow?.item
             viewController.viewModel = CarDetailsVC.ViewModel(carModel: viewModel.getCar(id: id!)!)
         }
     }
-
+    
     @IBAction func unwindToCarList(segue:UIStoryboardSegue) {
         
     }
+}
+
+private extension CarListVC {
     
+    func initFrame(){
+        let frame = loadingFrame(width: 100.0, height: 100.0)
+        loadingView = NVActivityIndicatorView(frame: frame, type: nil, color: UIColor.lightGray, padding: 3.0)
+        tableView.addSubview(loadingView)
+    }
+    
+    func loadingFrame(width : CGFloat, height : CGFloat) -> CGRect{
+        let x = tableView.center.x - width / 2
+        let y = tableView.center.y - height / 2
+        return CGRect(x: x, y: y, width: width, height: height)
+    }
+    
+    func startAnimating(){
+        loadingView.startAnimating()
+    }
+    
+    func stopAnimating(){
+        loadingView.stopAnimating()
+    }
 }

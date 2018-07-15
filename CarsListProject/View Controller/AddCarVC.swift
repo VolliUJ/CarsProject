@@ -11,6 +11,7 @@ import NVActivityIndicatorView
 
 class AddCarVC : UIViewController, UITextFieldDelegate, NVActivityIndicatorViewable {
     private let unwindSegueIdentifier = "addCarUnwindSegue"
+    private let headText = "Create a car:"
     let viewModel = ViewModel()
     
     @IBOutlet weak var header: UILabel!
@@ -37,7 +38,7 @@ class AddCarVC : UIViewController, UITextFieldDelegate, NVActivityIndicatorViewa
         year.delegate = self
 
         viewModel.name.bind{
-            self.header.text = "New Car : \($0.unwrap())"
+            self.header.text = "\(self.headText) \($0.unwrap())"
             self.name.text = $0
         }
         
@@ -120,14 +121,6 @@ extension AddCarVC {
         return false
     }
     
-}
-
-private extension AddCarVC {
-    func showErrorDialog(message : String){
-        let alert =  UIAlertController(title: nil, message: message, preferredStyle: UIAlertControllerStyle.alert)
-        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
-    }
 }
 
 private extension UITextField {

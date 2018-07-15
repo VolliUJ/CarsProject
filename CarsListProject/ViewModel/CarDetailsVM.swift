@@ -12,24 +12,30 @@ extension CarDetailsVC {
     
     struct ViewModel {
         
+        private let idStr = "ID: "
+        private let nameStr = "Name: "
+        private let brandStr = "Brand: "
+        private let modelStr = "Model: "
+        private let yearStr = "Year: "
+        
         let carModel : CarModel
         
         var id: String {
-            return carModel.id ?? ""
+            return idStr + carModel.id.unwrap()
         }
         var name: String {
-            return carModel.name ?? ""
+            return nameStr + carModel.name.unwrap()
         }
         var model: String {
-            return carModel.model ?? ""
+            return modelStr + carModel.model.unwrap()
         }
         
         var brand: String {
-            return carModel.brand ?? ""
+            return brandStr + carModel.brand.unwrap()
         }
         
         var year: String{
-            return carModel.year != nil ? "\(carModel.year!)" : ""
+            return yearStr + carModel.year.toString()
         }
         
     }

@@ -15,6 +15,7 @@ class CarDetailsVC: UIViewController {
     @IBOutlet private weak var brand: UILabel!
     @IBOutlet private weak var model: UILabel!
     @IBOutlet private weak var year: UILabel!
+    @IBOutlet weak var header: UILabel!
     
     var viewModel : ViewModel!
     
@@ -22,7 +23,6 @@ class CarDetailsVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         updateUI()
-        // Do any additional setup after loading the view, typically from a nib.
     }
 
     private func updateUI(){
@@ -32,12 +32,6 @@ class CarDetailsVC: UIViewController {
         model.text = viewModel.model
         year.text = viewModel.year
     }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
 
 }
 

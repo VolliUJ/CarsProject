@@ -44,7 +44,6 @@ enum ApiClient: URLRequestConvertible {
     var body: Data?{
         switch self {
         case .create(let carModel):
-//            return try? carModel.toJSON().rawData()
             return carModel.toData()
         default:
             return nil

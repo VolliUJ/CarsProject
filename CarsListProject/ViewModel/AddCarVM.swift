@@ -53,7 +53,7 @@ extension AddCarVC.ViewModel {
             case .success:
 
                 guard let data = responseData.data, let json = try? JSON(data: data) else {
-                    let error = NSError.init(domain: "tutaj", code: 600, userInfo: [:]) as Error
+                    let error = NSError.init(domain: StaticString.domainParseError, code: 600, userInfo: [:]) as Error
                     self.onError(error: error)
                     return
                 }
@@ -70,7 +70,7 @@ extension AddCarVC.ViewModel {
     }
     
     private func onError(error : Error){
-        self.state.value = State.error("Request Error")
+        self.state.value = State.error(StaticString.networkMessageError)
     }
     
 }
